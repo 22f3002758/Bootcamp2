@@ -1,0 +1,5 @@
+print("Hello1")
+print(__name__)
+
+if __name__=="__main__":
+    print("From Hello1")
