@@ -16,50 +16,50 @@
             <h5 class="card-header">Create Service Provider</h5>
             <div class="card-body">
 
-                <form action="" method="POST">
+                <form action="/manageproviders?action={% if spobj %}edit&id={{spobj.id}}{% else %}create{% endif %}" method="POST">
                     <div class="row">
                         <div class="mb-3 col">
                             <label for="exampleInputEmail1" class="form-label">Email address</label>
                             <input type="email" class="form-control" id="exampleInputEmail1"
-                                aria-describedby="emailHelp" name="email">
+                                aria-describedby="emailHelp" name="email" value="{% if spobj %}{{spobj.email}}{% endif %}">
                         </div>
                         <div class="mb-3 col">
                             <label for="exampleInputPassword1" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="exampleInputPassword1" name="pwd">
+                            <input type="text" class="form-control" id="exampleInputPassword1" name="pwd" value="{% if spobj %}{{spobj.password}}{% endif %}">
                         </div>
                     </div>
                     <div class="row">
                         <div class="mb-3 col">
                             <label for="servicename" class="form-label">Service provider Name</label>
                             <input type="text" class="form-control" id="servicename" aria-describedby="emailHelp"
-                                name="">
+                                name="name" value="{% if spobj %}{{spobj.name}}{% endif %}">
 
                         </div>
                         <div class="mb-3 col">
                             <label for="servicename" class="form-label">Experience</label>
                             <input type="text" class="form-control" id="servicename" aria-describedby="emailHelp"
-                                name="">
+                                name="exp" value="{% if spobj %}{{spobj.exp}}{% endif %}">
 
                         </div>
                     </div>
                     <div class="row">
                         <div class="mb-3 col">
                             <label for="Baseprice" class="form-label">City</label>
-                            <input type="text" class="form-control" id="Baseprice" name="">
+                            <input type="text" class="form-control" id="Baseprice" name="city" value="{% if spobj %}{{spobj.city}}{% endif %}">
 
                         </div>
                         <div class="mb-3 col">
                             <label for="Baseprice" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="Baseprice" name="">
+                            <input type="text" class="form-control" id="Baseprice" name="phone" value="{% if spobj %}{{spobj.phone}}{% endif %}">
 
                         </div>
                     </div>
                     <div class="mb-3">
-                        <select class="form-select" aria-label="Default select example">
-                            <option selected>Select Service</option>
-                            <option value="1">Home Cleaning</option>
-                            <option value="2">Home Decor</option>
-                            
+                        <select class="form-select" aria-label="Default select example" name="cat">
+                            <option selected>{% if spobj %}{{spobj.servicename}}{% else %}Select Service{% endif %}</option>
+                            {% for s in services %}
+                            <option value="{{s.name}}">{{s.name}}</option>
+                            {% endfor %}
                         </select>
 
                     </div>

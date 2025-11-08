@@ -16,22 +16,22 @@
             <h5 class="card-header">Create Service</h5>
             <div class="card-body">
                 
-                <form action="" method="POST">
+                <form action="/createservices?action={% if servobj %}edit&id={{servobj.id}}{% else %}create{% endif %}" method="POST">
 
                     <div class="mb-3">
                         <label for="servicename" class="form-label">Service Name</label>
                         <input type="text" class="form-control" id="servicename" aria-describedby="emailHelp"
-                            name="">
+                            name="name" value="{% if servobj %}{{servobj.name}}{% endif %}">
 
                     </div>
                     <div class="mb-3">
                         <label for="Baseprice" class="form-label">Base Price</label>
-                        <input type="text" class="form-control" id="Baseprice" name="">
+                        <input type="text" class="form-control" id="Baseprice" name="bp" value="{% if servobj %}{{servobj.baseprice}}{% endif %}">
 
                     </div>
                     <div class="mb-3">
                         <label for="Description" class="form-label">Description</label>
-                        <input type="text" class="form-control" id="Description" name="">
+                        <input type="text" class="form-control" id="Description" name="desc" value="{% if servobj %}{{servobj.description}}{% endif %}">
 
                     </div>
 

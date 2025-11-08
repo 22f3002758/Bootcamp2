@@ -10,7 +10,7 @@ def create_app():
     loginmanager=LoginManager(app)
     @loginmanager.user_loader
     def load_user(email):
-        obj=db.session.query(ServiceProvider).filter_by(email).first() or db.session.query(Customer).filter_by(email=email).first() or db.session.query(Admin).filter_by(email=email).first()
+        obj=db.session.query(ServiceProvider).filter_by(email=email).first() or db.session.query(Customer).filter_by(email=email).first() or db.session.query(Admin).filter_by(email=email).first()
         return obj   
     app.app_context().push()
     return app
@@ -19,6 +19,7 @@ def create_app():
 app=create_app()
 from backend.create_initialdata import *
 from backend.routes import *
+
 
 if __name__=="__main__":
     app.run(debug=True)

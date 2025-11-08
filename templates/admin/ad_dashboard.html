@@ -34,7 +34,7 @@
                                 <i class="bi bi-person"></i>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Logout</a></li>
+                                <li><a href="/logout" class="dropdown-item" href="#">Logout</a></li>
 
                             </ul>
                         </li>
@@ -47,7 +47,7 @@
         <div class="card ms-3 me-3">
             <div class="card-header d-flex">
                 <p>Services</p>
-                <button type="button" class="btn btn-primary ms-auto me-3"><i class="bi bi-plus"></i>Create</button>
+                <a href="/createservices?action=create" type="button" class="btn btn-primary ms-auto me-3"><i class="bi bi-plus"></i>Create</a>
             </div>
             <div class="card-body">
                 <table class="table border  ">
@@ -61,20 +61,21 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for s in services %}
                         <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{s.name}}</td>
+                            <td>{{s.baseprice}}</td>
+                            <td>{{s.description}}</td>
                             <td>
                                 <!-- Button trigger modal -->
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal">
+                                    data-bs-target="#exampleModal{{s.id}}">
                                     <i class="bi bi-trash"></i>
                                 </button>
 
                                 <!-- Modal -->
-                                <div class="modal fade" id="exampleModal" tabindex="-1"
+                                <div class="modal fade" id="exampleModal{{s.id}}" tabindex="-1"
                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -84,20 +85,20 @@
                                                     aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                Are you sure you want to delete?
+                                                Are you sure you want to delete {{s.name}}?
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary">Delete</button>
+                                                <a href="/createservices?action=delete&id={{s.id}}" type="button" class="btn btn-primary">Delete</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-primary"><i class="bi bi-pen"></i></button>
+                                <a href="/createservices?action=edit&id={{s.id}}" type="button" class="btn btn-primary"><i class="bi bi-pen"></i></a>
                             </td>
                         </tr>
-
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -105,7 +106,7 @@
         <div class="card ms-3  mt-5 me-5">
             <div class="card-header d-flex">
                 <p>Service Provider</p>
-                <button type="button" class="btn btn-primary ms-auto me-3"><i class="bi bi-plus"></i>Create</button>
+                <a href="/manageproviders?action=create" type="button" class="btn btn-primary ms-auto me-3"><i class="bi bi-plus"></i>Create</a>
             </div>
             <div class="card-body">
                 <table class="table border  ">
@@ -120,21 +121,22 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for sp in serviceproviders %}
                         <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Home Cleaning</td>
-                            <td>sp1@gmail.com</td>
-                            <td>9801234643</td>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{sp.name}}</td>
+                            <td>{{sp.servicename}}</td>
+                            <td>{{sp.email}}</td>
+                            <td>{{sp.phone}}</td>
                             <td>
                                 <!-- Button trigger modal -->
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal">
+                                    data-bs-target="#exampleModal{{sp.id}}">
                                     <i class="bi bi-trash"></i>
                                 </button>
 
                                 <!-- Modal -->
-                                <div class="modal fade" id="exampleModal" tabindex="-1"
+                                <div class="modal fade" id="exampleModal{{sp.id}}" tabindex="-1"
                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -144,20 +146,20 @@
                                                     aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                Are you sure you want to delete?
+                                                Are you sure you want to delete {{sp.name}}?
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary">Delete</button>
+                                                <a href="/manageproviders?action=delete&id={{sp.id}}" type="button" class="btn btn-primary">Delete</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-primary"><i class="bi bi-pen"></i></button>
+                                <a href="/manageproviders?action=edit&id={{sp.id}}" type="button" class="btn btn-primary"><i class="bi bi-pen"></i></a>
                             </td>
                         </tr>
-
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -165,7 +167,7 @@
         <div class="card ms-3 me-3 mt-5">
             <div class="card-header d-flex">
                 <p>Customer</p>
-                <button type="button" class="btn btn-primary ms-auto me-3"><i class="bi bi-plus"></i>Create</button>
+                
             </div>
             <div class="card-body">
                 <table class="table border  ">
@@ -179,43 +181,19 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for c in customers %}
                         <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{c.name}}</td>
+                            <td>{{c.email}}</td>
+                            <td>{{c.phone}}</td>
                             <td>
-                                <!-- Button trigger modal -->
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-
-                                <!-- Modal -->
-                                <div class="modal fade" id="exampleModal" tabindex="-1"
-                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Delete</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Are you sure you want to delete?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary">Delete</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-primary">Flag</button>
+                                <button type="button" class="btn btn-primary"><i class="bi bi-eye"></i></button>
+                                <a href="/managecust?action={% if c.status=='Active' %}Flag{% else %}Unflag{% endif %}&id={{c.id}}" type="button" class="btn btn-primary"> 
+                                    {% if c.status=='Active' %}Flag{% else %}Unflag{% endif %}</a>
                             </td>
                         </tr>
-
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
