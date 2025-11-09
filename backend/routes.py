@@ -1,6 +1,7 @@
 from flask import current_app as app, render_template, request, redirect
 from backend.models import *
 from flask_login import login_user, login_required,current_user,logout_user
+from sqlalchemy import or_
 
 @app.route('/')
 def home():
@@ -85,6 +86,27 @@ def ad_dasboard():
     else:
         return "Unauthorized access"
     
+
+@app.route("/search/admin", methods=["GET","POST"]) 
+def ad_search():
+    if request.method=="GET":
+        return render_template("admin/search.html")
+    elif request.method=="POST":
+        qtype=request.form.get("querytype")
+        qry=request.form.get("query")
+        if qtype=="service" and qry:
+            obj=db.session.query(Services).filter(or_(Services.name.ilike(f"%{qry}%"),Services.description.ilike(f"%{qry}%"))).all()
+            return render_template("admin/search.html",services=obj, qtype=qtype)
+        if qtype=="sp" and qry:
+            obj=db.session.query(ServiceProvider).filter(or_(ServiceProvider.name.ilike(f"%{qry}%"),ServiceProvider.email.ilike(f"%{qry}%"))).all()
+            return render_template("admin/search.html",serviceproviders=obj, qtype=qtype)
+        if qtype=="cust" and qry:
+            obj=db.session.query(Customer).filter(or_(Customer.name.ilike(f"%{qry}%"),Customer.email.ilike(f"%{qry}%"))).all()
+            return render_template("admin/search.html",customers=obj, qtype=qtype)
+
+
+
+
 @app.route("/createservices", methods=["GET","POST"])
 def services():
     if request.method=="GET" and request.args.get("action")=="create":
