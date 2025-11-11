@@ -70,10 +70,19 @@ def sp_dasboard():
 @app.route("/dashboard/cust", methods=['GET','POST'])
 @login_required
 def cust_dasboard():
-    if isinstance(current_user,Customer):
-        return f"Welcome to customer dashboard{current_user.email}"  
+    if isinstance(current_user,Customer):##RBAC
+        services=db.session.query(Services).all()
+        return render_template("customer/custdash.html", services=services) 
     else:
         return "Unauthorized access"
+    
+@app.route("/service/<servicename>", methods=["GET","POST"])
+def viewservice(servicename):
+    if request.method=="GET":
+        spobjs=db.session.query(ServiceProvider).filter_by(servicename=servicename).all()
+        return render_template("customer/service.html",sps=spobjs,servicename=servicename)    
+
+    
 
 @app.route("/dashboard/ad", methods=['GET','POST'])
 @login_required
@@ -103,6 +112,22 @@ def ad_search():
         if qtype=="cust" and qry:
             obj=db.session.query(Customer).filter(or_(Customer.name.ilike(f"%{qry}%"),Customer.email.ilike(f"%{qry}%"))).all()
             return render_template("admin/search.html",customers=obj, qtype=qtype)
+        
+@app.route("/search/cust", methods=["GET","POST"]) 
+def cust_search():
+    if request.method=="GET":
+        return render_template("customer/search.html")
+    elif request.method=="POST":
+        qtype=request.form.get("querytype")
+        qry=request.form.get("query")
+        if qtype=="service" and qry:
+            objs=db.session.query(Services).filter(or_(Services.name.ilike(f"%{qry}%"),Services.description.ilike(f"%{qry}%"))).all()
+            return render_template("customer/search.html",services=objs, qtype=qtype)
+        if qtype=="sp" and qry:
+            objs=db.session.query(ServiceProvider).filter(or_(ServiceProvider.name.ilike(f"%{qry}%"),ServiceProvider.email.ilike(f"%{qry}%"))).all()
+            return render_template("customer/search.html",serviceproviders=objs, qtype=qtype)
+
+    
 
 
 

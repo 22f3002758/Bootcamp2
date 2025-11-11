@@ -23,7 +23,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mb-2 mb-lg-0 fs-4 ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/search/cust">Search</a>
+                            <a class="nav-link active" aria-current="page" href="#">Search</a>
                         </li>
                         
                         <li class="nav-item dropdown">
@@ -42,30 +42,10 @@
                 </div>
             </div>
         </nav>
-        <div class="card ms-3 me-3">
-            <div class="card-header d-flex">
-                <p>Services</p>
-                
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    {% for s in services %}
-                    <div class="col-2">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <p>{{s.name}}</p>
-                                <a href="/service/{{s.name}}" type="button" class="btn btn-primary">View</a>
-                            </div>
-                        </div>
-
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+        
         <div class="card ms-3  mt-5 me-5">
             <div class="card-header d-flex">
-                <p>Upcoming Bookings</p>
+                <p>{{servicename}}</p>
                 
             </div>
             <div class="card-body">
@@ -74,65 +54,32 @@
                         <tr>
                             <th scope="col">#</th>
                             
-                            <th scope="col">Service Name</th>
                             <th scope="col">Provider Name</th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Time</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- {% for sp in serviceproviders %} -->
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Home Cleaning</td>
-                            <td>Sudha</td>
-                            <td>23-11-2025</td>
-                            <td>8am-9am</td>
-                            <td>
-                               <a href="" type="button" class="btn btn-primary">Cancel</a>
-                            </td>
-                        </tr>
-                        <!-- {% endfor %} -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card ms-3  mt-5 me-5">
-            <div class="card-header d-flex">
-                <p>Booking History</p>
-                
-            </div>
-            <div class="card-body">
-                <table class="table border  ">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
+                            <th scope="col"> Base Price</th>
+                            <th scope="col">Description</th>
                             
-                            <th scope="col">Service Name</th>
-                            <th scope="col">Provider Name</th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Time</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- {% for sp in serviceproviders %} -->
+                        
+                         {% for sp in sps %}
                         <tr>
-                            <th scope="row">1</th>
-                            <td>Home Cleaning</td>
-                            <td>Sudha</td>
-                            <td>23-11-2025</td>
-                            <td>8am-9am</td>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{sp.name}}</td>
+                            <td>{{sp.service.baseprice}}</td>
+                            <td>{{sp.service.description}}</td>
+                            
                             <td>
-                               <a href="" type="button" class="btn btn-primary">View Suggestion</a>
+                               <a href="" type="button" class="btn btn-primary">Book</a>
                             </td>
                         </tr>
-                        <!-- {% endfor %} -->
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
+        
 
     </div>
 </body>
