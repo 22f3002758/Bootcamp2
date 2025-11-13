@@ -22,10 +22,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mb-2 mb-lg-0 fs-4 ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Search</a>
-                        </li>
-                        
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
@@ -42,45 +39,45 @@
                 </div>
             </div>
         </nav>
-        
-        <div class="card ms-3  mt-5 me-5">
-            <div class="card-header d-flex">
-                <p>{{servicename}}</p>
-                
-            </div>
-            <div class="card-body">
-                <table class="table border  ">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            
-                            <th scope="col">Provider Name</th>
-                            <th scope="col"> Base Price</th>
-                            <th scope="col">Description</th>
-                            
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                         {% for sp in sps %}
-                        <tr>
-                            <th scope="row">{{loop.index}}</th>
-                            <td>{{sp.name}}</td>
-                            <td>{{sp.service.baseprice}}</td>
-                            <td>{{sp.service.description}}</td>
-                            
-                            <td>
-                               <a href="/slotbooking?id={{sp.id}}" type="button" class="btn btn-primary">Book</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="container-fluid d-flex justify-content-center mt-5">
+            <div class="card" style="width: 90rem;">
+                <div class="card-body">
+
+                    <form action="/slotbooking" method="POST">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    
+                                    <th scope="col">slots</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for date,slots in all_slots.items() %}
+                                <tr>
+                                    <th scope="row">{{date}}</th>
+                                    
+                                    <td>
+                                    {% for s in slots %}
+                                    {% set sid=s.id | string %}
+                                    {% set slot_value=date.strftime('%Y-%m-%d')+'_'+s.start_time.strftime('%H:%M')+'_'+s.end_time.strftime('%H:%M')+"_"+sid %}
+                                        <input type="radio" name="slot" class="btn-check" value="{{slot_value}}"
+                                        id="btn-check-{{date}}{{loop.index}}" autocomplete="off">
+                                        <label class="btn btn-primary" for="btn-check-{{date}}{{loop.index}}">{{s.start_time.strftime('%H:%M')}}-{{s.end_time.strftime('%H:%M')}}</label>
+                                    {% endfor %}
+                                    </td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
             </div>
         </div>
-        
-
     </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

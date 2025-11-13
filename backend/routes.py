@@ -2,6 +2,7 @@ from flask import current_app as app, render_template, request, redirect
 from backend.models import *
 from flask_login import login_user, login_required,current_user,logout_user
 from sqlalchemy import or_
+from datetime import datetime, timedelta
 
 @app.route('/')
 def home():
@@ -63,16 +64,82 @@ def logout():
 @login_required
 def sp_dasboard():
     if isinstance(current_user,ServiceProvider):
-        return f"Welcome to sp dashboard{current_user.email}"      
+        req_obj=current_user.receive_request
+        print(req_obj)
+        return render_template("provider/spdash.html", requests=req_obj)      
     else:
         return "Unauthorized access"
+    
+
+def nextsevendates():
+    today = datetime.now().date()
+    L = []
+    for i in range(1,8):
+        L.append(today + timedelta(days=i))
+    return L
+
+def get_fixedslots():
+    fixed_slots = [
+        ('09:00', '10:00'),
+        ('10:00', '11:00'),
+        ('11:00', '12:00'),
+        ('12:00', '13:00'),
+        ('15:00', '16:00'),
+        ('16:00', '17:00'),
+        ('17:00', '18:00')
+    ]
+    L = []
+    for fs in fixed_slots:
+        L.append((
+            datetime.strptime(fs[0], '%H:%M').time(),
+            datetime.strptime(fs[1], '%H:%M').time()
+        ))
+    return L
+
+@app.route("/availability/sp",methods=['GET','POST'])
+def availability():
+    if request.method=="GET":
+        L=[]
+        nextsevendays=nextsevendates()
+        fixedslots=get_fixedslots()
+        existing_slots=db.session.query(ProvidersAvailability).filter(ProvidersAvailability.sp_id==current_user.id,ProvidersAvailability.date>datetime.now().date()).all()
+
+        for day in nextsevendays:
+            slot_list=[]
+            for start, end in fixedslots:
+                if any(es.date==day and es.start_time==start and es.status=="Booked" for es in existing_slots):
+                    slot_list.append({'start_time':start,'end_time':end,'status':'Booked'})
+                elif any(es.date==day and es.start_time==start and es.status=="Available" for es in existing_slots):
+                    slot_list.append({'start_time':start,'end_time':end,'status':'Selected'})
+                else:
+                    slot_list.append({'start_time':start,'end_time':end,'status':'Not Selected'})  
+            L.append({'date':day,'slots':slot_list})
+        return render_template("provider/availability.html",all_slots=L)     
+
+    elif request.method=="POST":
+        selected_slots=request.form.getlist("slot") 
+        db.session.query(ProvidersAvailability).filter(ProvidersAvailability.sp_id==current_user.id,ProvidersAvailability.status=='Available',
+                                                       ProvidersAvailability.date>datetime.now().date()).delete()
+        for s in selected_slots:
+            avail_date,start_time,end_time=s.split("_") 
+            avail_date=datetime.strptime(avail_date,"%Y-%m-%d").date()
+            start_time=datetime.strptime(start_time,"%H:%M").time()
+            end_time=datetime.strptime(end_time,"%H:%M").time()  
+            pa=ProvidersAvailability(sp_id=current_user.id,date=avail_date,start_time=start_time,end_time=end_time,status='Available')  
+            db.session.add(pa)
+            db.session.commit()
+        return redirect("/dashboard/sp")       
+
+
+
 
 @app.route("/dashboard/cust", methods=['GET','POST'])
 @login_required
 def cust_dasboard():
     if isinstance(current_user,Customer):##RBAC
         services=db.session.query(Services).all()
-        return render_template("customer/custdash.html", services=services) 
+        reqs=current_user.sent_request
+        return render_template("customer/custdash.html", services=services, requests=reqs) 
     else:
         return "Unauthorized access"
     
@@ -80,7 +147,37 @@ def cust_dasboard():
 def viewservice(servicename):
     if request.method=="GET":
         spobjs=db.session.query(ServiceProvider).filter_by(servicename=servicename).all()
-        return render_template("customer/service.html",sps=spobjs,servicename=servicename)    
+        return render_template("customer/service.html",sps=spobjs,servicename=servicename)   
+
+@app.route("/slotbooking",methods=["GET","POST"])
+def booking():
+    if request.method=="GET":
+        id=request.args.get("id")
+        paobjs=db.session.query(ProvidersAvailability).filter(ProvidersAvailability.sp_id==id,
+                                                             ProvidersAvailability.status=='Available',
+                                                             ProvidersAvailability.date>datetime.now().date())
+        d={}
+        for pa in paobjs:
+            if pa.date not in d:
+                d[pa.date]=[pa]
+            else:
+                d[pa.date].append(pa)
+        return render_template("customer/availableslots.html",all_slots=d)   
+    elif request.method=="POST":
+        slotstring=request.form.get("slot")
+        book_date,start_time,end_time,slot_id=slotstring.split("_")
+        book_date=datetime.strptime(book_date,"%Y-%m-%d").date()
+        start_time=datetime.strptime(start_time,"%H:%M").time()
+        end_time=datetime.strptime(end_time,"%H:%M").time()
+        paobj=db.session.query(ProvidersAvailability).filter_by(id=slot_id).first()
+        spid=paobj.sp_id
+        req=Request(slot_id=slot_id,r_date=book_date,start_time=start_time,end_time=end_time,sp_id=spid,
+                    c_id=current_user.id,r_status='Booked')
+        db.session.add(req)
+        paobj.status='Booked'
+        db.session.commit()
+        return redirect("dashboard/cust")
+
 
     
 
@@ -249,5 +346,32 @@ def managecust():
         db.session.commit()
         return redirect("dashboard/ad")
 
+
+@app.route("/managerequest", methods=["GET","POST"])
+@login_required
+def cancelbooking():
+    if request.method=="GET" and request.args.get("action")=='cancel':
+        reqid=request.args.get('id')
+        reqobj=db.session.query(Request).filter_by(r_id=reqid).first()
+        print(reqobj)
+        reqobj.r_status="Cancelled"
+        paobj=db.session.query(ProvidersAvailability).filter_by(id=reqobj.slot_id).first()
+        paobj.status="Available"
+        db.session.commit()
+        if isinstance(current_user,Customer):
+            return redirect("/dashboard/cust")
+        if isinstance(current_user,ServiceProvider):
+            return redirect("/dashboard/sp")
+        
+    elif request.method=="GET" and request.args.get("action")=='complete':
+        reqid=request.args.get('id')
+        reqobj=db.session.query(Request).filter_by(r_id=reqid).first()
+        reqobj.r_status="Completed"
+        paobj=db.session.query(ProvidersAvailability).filter_by(id=reqobj.slot_id).first()
+        paobj.status="Completed"
+        db.session.commit()
+        return redirect("/dashboard/sp")
+    
+        
 
 

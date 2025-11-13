@@ -77,23 +77,27 @@
                             <th scope="col">Service Name</th>
                             <th scope="col">Provider Name</th>
                             <th scope="col">Date</th>
-                            <th scope="col">Time</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">End Time</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- {% for sp in serviceproviders %} -->
+                        {% for req in requests %}
+                        {% if req.r_status=='Booked' %}
                         <tr>
                             <th scope="row">1</th>
-                            <td>Home Cleaning</td>
-                            <td>Sudha</td>
-                            <td>23-11-2025</td>
-                            <td>8am-9am</td>
+                            <td>{{req.service.servicename}}</td>
+                            <td>{{req.service.name}}</td>
+                            <td>{{req.r_date}}</td>
+                            <td>{{req.start_time}}</td>
+                            <td>{{req.end_time}}</td>
                             <td>
-                               <a href="" type="button" class="btn btn-primary">Cancel</a>
+                               <a href="/managerequest?action=cancel&id={{req.r_id}}" type="button" class="btn btn-primary">Cancel</a>
                             </td>
                         </tr>
-                        <!-- {% endfor %} -->
+                        {% endif %}
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -112,23 +116,27 @@
                             <th scope="col">Service Name</th>
                             <th scope="col">Provider Name</th>
                             <th scope="col">Date</th>
-                            <th scope="col">Time</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">End Time</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- {% for sp in serviceproviders %} -->
+                        {% for req in requests %}
+                        {% if req.r_status!='Booked' %}
                         <tr>
                             <th scope="row">1</th>
-                            <td>Home Cleaning</td>
-                            <td>Sudha</td>
-                            <td>23-11-2025</td>
-                            <td>8am-9am</td>
+                            <td>{{req.service.servicename}}</td>
+                            <td>{{req.service.name}}</td>
+                            <td>{{req.r_date}}</td>
+                            <td>{{req.start_time}}</td>
+                            <td>{{req.end_time}}</td>
                             <td>
-                               <a href="" type="button" class="btn btn-primary">View Suggestion</a>
+                               <a href="" type="button" class="btn btn-primary">Cancel</a>
                             </td>
                         </tr>
-                        <!-- {% endfor %} -->
+                        {% endif %}
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
