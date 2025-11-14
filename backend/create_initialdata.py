@@ -16,8 +16,8 @@ with app.app_context():
         sp4=ServiceProvider(email="sp4@gmail.com",password="asdf",servicename='Home Decor', status='Active')   
         db.session.add_all([sp1,sp2,sp3,sp4])
         db.session.commit()
-    print(db.session.query(Admin).count==0)
-    if db.session.query(Admin).count==0:
+    print(db.session.query(Admin).count()==0)
+    if db.session.query(Admin).count()==0:
         ad=Admin(email="admin@gmail.com", password="asdf")    
         db.session.add(ad)
         db.session.commit()

@@ -3,6 +3,12 @@ from backend.models import *
 from flask_login import login_user, login_required,current_user,logout_user
 from sqlalchemy import or_
 from datetime import datetime, timedelta
+import os
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('agg')
+
+
 
 @app.route('/')
 def home():
@@ -371,6 +377,27 @@ def cancelbooking():
         paobj.status="Completed"
         db.session.commit()
         return redirect("/dashboard/sp")
+    
+@app.route('/admin/statistics')
+def stats():
+    if request.method=="GET":
+        servicename=[]
+        no_of_providers=[]
+        all_services=db.session.query(Services).all()
+        for s in all_services:
+            servicename.append(s.name)
+            count=len(s.Sproviders)
+            no_of_providers.append(count)
+        plt.bar(servicename,no_of_providers)
+        plt.xlabel('Services')
+        plt.ylabel('No of Providers')
+        plt.title("Services vs No of Providers")
+        os.makedirs('./static',exist_ok=True)   
+        plt.savefig('./static/services_vs_providers.png')
+        plt.close()
+        return render_template("/admin/statistic.html") 
+
+
     
         
 
